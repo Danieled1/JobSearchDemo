@@ -1,0 +1,56 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+body{
+    height: 100vh;
+    width: 100%;
+}
+#divArea{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 16px;
+    padding: 8px;
+}
+iframe{
+    width: 100%;
+    height: 100vh;
+}
+.card{
+    width: 18rem;
+    margin: 8px;
+    flex: 33.3%;
+    background-color: antiquewhite !important;
+}
+.card,.cardBody{
+    display: flex;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.card-title{
+    text-align: center;
+}
+img{
+    width: 100px !important;
+    
+}
+.infoJob{
+    height: 300px;
+    overflow-y: scroll;
+    font-size: 1.2rem;
+    padding:16px;
+    /* text-align: center; */
+}
+@media only screen and (max-width: 900px) {
+    #divArea {
+      flex-direction:column;
+      justify-content: center;
+      width: 100%;
+    }
+    .card,.cardBody{
+        display: flex;
+        width: 100% !important;
+    }
+  }
