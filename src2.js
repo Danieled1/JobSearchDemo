@@ -1,22 +1,25 @@
+// url requests
 let urlCategories = 'https://remotive.com/api/remote-jobs/categories'
 let urlCategory = 'https://remotive.com/api/remote-jobs?limit=50&category='
 let allJobs = 'https://remotive.com/api/remote-jobs?limit=50'
 
-//Managing local storage, create new jobs array if not exist
+// Managing local storage, create new jobs array if not exist
 let localStorageSavedJobs = localStorage.getItem('jobs')
 ? JSON.parse(localStorage.getItem('jobs'))
 : []
 
-// decleration of main parts of the pagee
+// Decleration of main parts on page
 const parentEvents = document.querySelector('#parentEvents')
 const jobsSection = document.querySelector('#divArea')
 const dropDownMenu = document.querySelector('.dropdown-menu')
 const searchForm = document.querySelector('#searchForm')
+const loader = document.querySelector('#loader')
+
 let onSaved = false
 
-// Looping through all the events that accour in the parent element(the navbar)
-// And fetch the correct data
 const fetchingData = event => {
+    // Looping through all the events that accour in the parent element(the navbar)
+    // And fetch the correct data
     if(event.target !== event.currentTarget){
         let eventName = event.target.innerHTML
         const getData = async() => {
@@ -24,8 +27,10 @@ const fetchingData = event => {
             try{
                 switch (eventName) {
                     case 'All Jobs':
+                        showloading()
                         const response = await fetch(allJobs)
                         const data = await response.json()
+                        hideLoading()
                         showAllJobs(data.jobs)
     
                     case 'Categories':
@@ -34,17 +39,23 @@ const fetchingData = event => {
                             const response = await fetch(urlCategories)
                             const data = await response.json()
                             buildCategories(data.jobs)
+                            showloading()
                         }
                         return null
                     case 'Saved Jobs💝':
-                        localStorageSavedJobs.forEach( async(item) => {
-                            jobsSection.append(buildCard(item[0],true))
-                            //just select all the savedjobs btns and change their class
-                            const btns = jobsSection.querySelectorAll('.remove')
-                            btns.forEach(item => {
-                                setElement(item,'btn btn-danger remove','Remove')
+                        if(localStorageSavedJobs.length > 0){
+                            showloading()
+                            localStorageSavedJobs.forEach( async(item) => {
+                                jobsSection.append(buildCard(item[0],true))
+                                //just select all the savedjobs btns and change their class
+                                const btns = jobsSection.querySelectorAll('.remove')
+                                btns.forEach(item => {
+                                    setElement(item,'btn btn-danger remove','Remove')
+                                })
                             })
-                        })
+                            hideLoading()
+                        }
+                        jobsSection.append('No jobs saved...')
                 }       
             } catch (err){
                 console.log(err);
@@ -55,8 +66,8 @@ const fetchingData = event => {
 }
 parentEvents.addEventListener('click', fetchingData, false)
 
-//Search functionallity 
 searchForm.addEventListener('submit', async(e) => {
+    // Search functionallity 
     jobsSection.innerHTML = ''
     e.preventDefault()
     let searchValue = document.getElementById('searchBar')
@@ -66,8 +77,8 @@ searchForm.addEventListener('submit', async(e) => {
     showAllJobs(data6.jobs)
 })
 
-// Main function that builds most of the website
 const showAllJobs = (jobsData) => {
+    // Main function that builds most of the website
     jobsData.map(item => {
         jobsSection.append(buildCard(item))
     })
@@ -88,6 +99,7 @@ const buildCategories = (categories) => {
             showAllJobs(data5.jobs)
         })
     })
+    hideLoading()
     
 }
 
@@ -135,8 +147,9 @@ const setElement = (element,classStr,innerStr=element.innerHTML) => {
     element.className = classStr
     element.innerHTML = innerStr 
 }
-//bool indicates whether on savedJobs event
+
 const localStorageBtnEvents = (saveBtn, seeMoreBtn, data, bool) => {
+    //bool indicates whether on savedJobs event
     saveBtn.addEventListener('click',() => {
         if(saveBtn.innerHTML === 'Save This'){
             if(!bool){
@@ -174,4 +187,15 @@ const localStorageBtnEvents = (saveBtn, seeMoreBtn, data, bool) => {
         jobsSection.append(iframe);
     })
     return saveBtn, seeMoreBtn
+}
+
+function showloading(){
+    //Manipulation of loader while fetching data
+    loader.style.display = 'flex'
+    setTimeout(() => {
+        loader.style.display = 'none'
+    }, 3000)
+}
+function hideLoading(){
+    loader.style.display = 'none'
 }
