@@ -1,10 +1,22 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
+:root{
+    --main-color:#fefae0;
+    --light-color:#faedcd;
+    --dark-color: hsl(230, 75%, 90%);
+}
 *{
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif !important;
 }
 body{
     height: 100vh;
     width: 100%;
+    background-color: var(--main-color) !important;
+}
+.navbar-custom{
+    background-color: #d4a373!important;
 }
 #divArea{
     display:flex;
@@ -22,27 +34,88 @@ iframe{
     width: 18rem;
     margin: 8px;
     flex: 33.3%;
-    background-color: antiquewhite !important;
+    background-color:  var(--dark-color)!important;
 }
 .card,.cardBody{
     display: flex;
     justify-content: center !important;
     align-items: center !important;
+    width: 100%;
+    outline: none;
+    cursor: pointer;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}
+.no-outline:focus{
+    outline: none;
 }
 .card-title{
     text-align: center;
 }
 img{
     width: 100px !important;
-    
+    height: 100px !important;
+    border-radius: 100px;
+    vertical-align: center;
 }
 .infoJob{
     height: 300px;
+    width: 100%;
     overflow-y: scroll;
     font-size: 1.2rem;
     padding:16px;
-    /* text-align: center; */
+    text-align: center;
 }
+.content {
+    position: relative;
+  }
+  .content h2 {
+    color: #fff;
+    font-size: 5em;
+    position: absolute;
+    left:50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .content h2:nth-child(1) {
+    color: transparent;
+    -webkit-text-stroke: 3px #31BAFD;
+  }
+  
+  .content h2:nth-child(2) {
+    color: #31BAFD;
+    animation: animate 4s ease-in-out infinite;
+  }
+  
+  @keyframes animate {
+    0%,
+    100% {
+      clip-path: polygon(
+        0% 25%,
+        16% 44%,
+        33% 50%,
+        54% 60%,
+        70% 61%,
+        84% 59%,
+        100% 52%,
+        100% 100%,
+        0% 100%
+      );
+    }
+  
+    50% {
+      clip-path: polygon(
+        0% 60%,
+        15% 65%,
+        34% 66%,
+        51% 62%,
+        67% 50%,
+        84% 45%,
+        100% 46%,
+        100% 100%,
+        0% 100%
+      );
+    }
+  }
 @media only screen and (max-width: 900px) {
     #divArea {
       flex-direction:column;
@@ -53,4 +126,4 @@ img{
         display: flex;
         width: 100% !important;
     }
-  }
+}

@@ -1,22 +1,26 @@
-let urlSearchByName = 'https://remotive.com/api/remote-jobs?limit=50&search='
-let urlSavedJobs = 'https://remotive.com/api/remote-jobs?&company_name='
 let urlCategories = 'https://remotive.com/api/remote-jobs/categories'
 let urlCategory = 'https://remotive.com/api/remote-jobs?limit=50&category='
 let allJobs = 'https://remotive.com/api/remote-jobs?limit=50'
 
+//Managing local storage, create new jobs array if not exist
 let localStorageSavedJobs = localStorage.getItem('jobs')
 ? JSON.parse(localStorage.getItem('jobs'))
 : []
 
+// decleration of main parts of the pagee
 const parentEvents = document.querySelector('#parentEvents')
-const mainArea = document.querySelector('#divArea')
+const jobsSection = document.querySelector('#divArea')
 const dropDownMenu = document.querySelector('.dropdown-menu')
+const searchForm = document.querySelector('#searchForm')
+let onSaved = false
+
+// Looping through all the events that accour in the parent element(the navbar)
+// And fetch the correct data
 const fetchingData = event => {
     if(event.target !== event.currentTarget){
         let eventName = event.target.innerHTML
-        // console.log(eventName);
         const getData = async() => {
-            mainArea.innerHTML = ''
+            jobsSection.innerHTML = ''
             try{
                 switch (eventName) {
                     case 'All Jobs':
@@ -27,14 +31,19 @@ const fetchingData = event => {
                     case 'Categories':
                         //Checks if the categories have been uploaded yet
                         if(dropDownMenu.childNodes.length === 1){
-                            const response2 = await fetch(urlCategories)
-                            const data2 = await response2.json()
-                            buildCategories(data2.jobs)
+                            const response = await fetch(urlCategories)
+                            const data = await response.json()
+                            buildCategories(data.jobs)
                         }
-                        return undefined
+                        return null
                     case 'Saved Jobs💝':
                         localStorageSavedJobs.forEach( async(item) => {
-                            mainArea.append(buildCard(item[0],true))
+                            jobsSection.append(buildCard(item[0],true))
+                            //just select all the savedjobs btns and change their class
+                            const btns = jobsSection.querySelectorAll('.remove')
+                            btns.forEach(item => {
+                                setElement(item,'btn btn-danger remove','Remove')
+                            })
                         })
                 }       
             } catch (err){
@@ -43,20 +52,29 @@ const fetchingData = event => {
         }
         getData()
     }
-    event.stopPropagation()
 }
 parentEvents.addEventListener('click', fetchingData, false)
 
+//Search functionallity 
+searchForm.addEventListener('submit', async(e) => {
+    jobsSection.innerHTML = ''
+    e.preventDefault()
+    let searchValue = document.getElementById('searchBar')
+    const urlSearchByName = `https://remotive.com/api/remote-jobs?limit=50&search=${searchValue.value}`
+    const response6 = await fetch(urlSearchByName)
+    const data6 = await response6.json()
+    showAllJobs(data6.jobs)
+})
+
+// Main function that builds most of the website
 const showAllJobs = (jobsData) => {
     jobsData.map(item => {
-        mainArea.append(buildCard(item))
+        jobsSection.append(buildCard(item))
     })
 }
 
-const showSearchsByName = () => {
-    //onkeyup 
-}
 const buildCategories = (categories) => {
+    //Function to build the categories and updates with the api
     categories.map(category => {
         const li = document.createElement('li')
         const a = document.createElement('a')
@@ -72,6 +90,7 @@ const buildCategories = (categories) => {
     })
     
 }
+
 const buildCard = (data,bool = false) => {
     //Creation of card elements
     const card = document.createElement('div')
@@ -88,16 +107,17 @@ const buildCard = (data,bool = false) => {
 
     companyLogo.src = data.company_logo
     jobDescription.setAttribute('contenteditable','true')
+    jobDescription.setAttribute('spellcheck','false')
 
     //Card assignments
     setElement(card,'card')
     setElement(cardBody,'card-body')
-    setElement(jobDescription,'card-text fw-light infoJob lh-sm', data.description)
+    setElement(jobDescription,'card-text lh-sm no-outline text-decoration-none text-muted infoJob', data.description)
     setElement(salary,'card-text text-center',data.salary)
-    setElement(companyName,'card-title',data.company_name)
+    setElement(companyName,'card-title fw-normal font-monospace',data.company_name)
     setElement(jobTitle,'card-title',data.title)
-    setElement(jobType,'card-text text-center','*' + data.job_type)
-    setElement(saveBtn,'btn btn-outline-danger','Save This')
+    setElement(jobType,'card-text text-center my-2','*' + data.job_type)
+    setElement(saveBtn,'btn btn-outline-danger remove','Save This')
     setElement(seeMoreBtn,'btn btn-success','See Full JOB')
     setElement(divBtns,'d-grid gap-2 col-6 mx-auto')
 
@@ -111,35 +131,37 @@ const buildCard = (data,bool = false) => {
 }
 
 const setElement = (element,classStr,innerStr=element.innerHTML) => {
+    //Function that sets classname and innerhtml to DOM element
     element.className = classStr
     element.innerHTML = innerStr 
 }
-
-const localStorageBtnEvents = (saveBtn,seeMoreBtn, data,bool) => {
+//bool indicates whether on savedJobs event
+const localStorageBtnEvents = (saveBtn, seeMoreBtn, data, bool) => {
     saveBtn.addEventListener('click',() => {
         if(saveBtn.innerHTML === 'Save This'){
-            localStorageSavedJobs.push([data])
-            console.log(localStorageSavedJobs);
-            localStorage.setItem('jobs',JSON.stringify(localStorageSavedJobs))
-            setElement(saveBtn,'btn btn-danger','Remove')
-
+            if(!bool){
+                localStorageSavedJobs.push([data])
+                console.log(localStorageSavedJobs);
+                localStorage.setItem('jobs',JSON.stringify(localStorageSavedJobs))
+                setElement(saveBtn,'btn btn-outline-danger','Remove')
+            }
         }else{
             if(bool){
-                setElement(saveBtn,'btn btn-danger','Remove')
                 localStorageSavedJobs = localStorageSavedJobs.filter(([item]) => {
                     if(item.id !== data.id){
                         return item
                     }
                 })
                 localStorage.setItem('jobs',JSON.stringify(localStorageSavedJobs))
+                setElement(saveBtn,'btn btn-danger','Remove')
                 saveBtn.parentElement.parentElement.remove()
             }else{
-                setElement(saveBtn,'btn btn-outline-danger','Save This')
                 localStorageSavedJobs = localStorageSavedJobs.filter(([item]) => {
                     if(item.id !== data.id){
                         return item
                     }
                 })
+                setElement(saveBtn,'btn btn-outline-danger','Save This')
                 localStorage.setItem('jobs',JSON.stringify(localStorageSavedJobs))
             }
         }
@@ -147,9 +169,9 @@ const localStorageBtnEvents = (saveBtn,seeMoreBtn, data,bool) => {
     seeMoreBtn.addEventListener('click', () => {
         const iframe = document.createElement('iframe')
         iframe.src = data.url
-        mainArea.innerHTML = ''
-        mainArea.innerHTML +=`<h1>Remotive Website</h1>`
-        mainArea.append(iframe);
+        jobsSection.innerHTML = ''
+        jobsSection.innerHTML +=`<h1>Remotive Website</h1>`
+        jobsSection.append(iframe);
     })
     return saveBtn, seeMoreBtn
 }
