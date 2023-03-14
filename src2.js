@@ -35,11 +35,12 @@ const fetchingData = event => {
     
                     case 'Categories':
                         //Checks if the categories have been uploaded yet
+                        showloading()
                         if(dropDownMenu.childNodes.length === 1){
                             const response = await fetch(urlCategories)
                             const data = await response.json()
                             buildCategories(data.jobs)
-                            showloading()
+                            
                         }
                         return null
                     case 'Saved Jobs💝':
@@ -54,8 +55,9 @@ const fetchingData = event => {
                                 })
                             })
                             hideLoading()
+                        }else{
+                            jobsSection.append('No jobs saved...')
                         }
-                        jobsSection.append('No jobs saved...')
                 }       
             } catch (err){
                 console.log(err);
@@ -79,9 +81,11 @@ searchForm.addEventListener('submit', async(e) => {
 
 const showAllJobs = (jobsData) => {
     // Main function that builds most of the website
+    showloading()
     jobsData.map(item => {
         jobsSection.append(buildCard(item))
     })
+    hideLoading()
 }
 
 const buildCategories = (categories) => {
@@ -124,13 +128,17 @@ const buildCard = (data,bool = false) => {
     //Card assignments
     setElement(card,'card')
     setElement(cardBody,'card-body')
-    setElement(jobDescription,'card-text lh-sm no-outline text-decoration-none text-muted infoJob', data.description)
+    setElement(
+        jobDescription,
+        'card-text lh-sm no-outline text-decoration-none text-muted infoJob',
+        data.description,
+    )
     setElement(salary,'card-text text-center',data.salary)
     setElement(companyName,'card-title fw-normal font-monospace',data.company_name)
     setElement(jobTitle,'card-title',data.title)
     setElement(jobType,'card-text text-center my-2','*' + data.job_type)
     setElement(saveBtn,'btn btn-outline-danger remove','Save This')
-    setElement(seeMoreBtn,'btn btn-success','See Full JOB')
+    setElement(seeMoreBtn,'btn btn-primary','See Full JOB')
     setElement(divBtns,'d-grid gap-2 col-6 mx-auto')
 
     //Function to handle btn events
@@ -180,11 +188,14 @@ const localStorageBtnEvents = (saveBtn, seeMoreBtn, data, bool) => {
         }
     })
     seeMoreBtn.addEventListener('click', () => {
+        showloading()
         const iframe = document.createElement('iframe')
         iframe.src = data.url
         jobsSection.innerHTML = ''
         jobsSection.innerHTML +=`<h1>Remotive Website</h1>`
         jobsSection.append(iframe);
+        hideLoading()
+
     })
     return saveBtn, seeMoreBtn
 }
@@ -199,3 +210,15 @@ function showloading(){
 function hideLoading(){
     loader.style.display = 'none'
 }
+const preloader = document.querySelector('.preloader')
+const fadeOutEffect = setInterval(() => {
+    if (!preloader.style.opacity) {
+      preloader.style.opacity = 1;
+    }
+    if (preloader.style.opacity > 0) {
+      preloader.style.opacity -= 0.20;
+    } else {
+      clearInterval(fadeOutEffect);
+      preloader.style.display = 'none'
+    }
+  }, 300);
