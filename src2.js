@@ -53,7 +53,7 @@ const fetchingData = event => {
                                 btns.forEach(item => {
                                     setElement(item,'btn btn-danger remove','Remove')
                                 })
-                            })
+                            }) 
                             hideLoading()
                         }else{
                             jobsSection.append('No jobs saved...')
@@ -70,12 +70,14 @@ parentEvents.addEventListener('click', fetchingData, false)
 
 searchForm.addEventListener('submit', async(e) => {
     // Search functionallity 
-    jobsSection.innerHTML = ''
-    e.preventDefault()
-    let searchValue = document.getElementById('searchBar')
-    const urlSearchByName = `https://remotive.com/api/remote-jobs?limit=50&search=${searchValue.value}`
+    const urlSearchByName = `https://remotive.com/api/remote-jobs?limit=10&search=${searchValue.value}`
+    console.log(searchValue.value);
+    
     const response6 = await fetch(urlSearchByName)
     const data6 = await response6.json()
+    let searchValue = document.getElementById('searchBar')
+    jobsSection.innerHTML = ''
+    e.preventDefault()
     showAllJobs(data6.jobs)
 })
 
@@ -216,7 +218,7 @@ const fadeOutEffect = setInterval(() => {
       preloader.style.opacity = 1;
     }
     if (preloader.style.opacity > 0) {
-      preloader.style.opacity -= 0.20;
+      preloader.style.opacity -= 0.30;
     } else {
       clearInterval(fadeOutEffect);
       preloader.style.display = 'none'
