@@ -140,7 +140,7 @@ const buildCard = (data,bool = false) => {
     setElement(jobTitle,'card-title',data.title)
     setElement(jobType,'card-text text-center my-2','*' + data.job_type)
     setElement(saveBtn,'btn btn-outline-danger remove','Save This')
-    setElement(seeMoreBtn,'btn btn-primary','See Full JOB')
+    setElement(seeMoreBtn,'btn btn-outline-dark','See Full JOB')
     setElement(divBtns,'d-grid gap-2 col-6 mx-auto')
 
     //Function to handle btn events
